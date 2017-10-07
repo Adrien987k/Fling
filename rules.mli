@@ -37,3 +37,6 @@ val ball_of_position : game -> Position.t -> ball
 
 (** [position_of_ball ball] returns the position of the ball [ball] *)
 val position_of_ball : ball -> Position.t
+
+(** *)
+val add_ball : game -> ball -> game

@@ -48,6 +48,30 @@ let rec get_ball_direction () =
       | None -> get_ball_direction () (* wrong key pressed by the player *)
     )
 
+(* return the number choosen by the player *)
+let rec get_number () =
+  let num_of_char c =
+    Rules.(
+      match c with
+      | '0' -> Some 0
+      | '1' -> Some 1
+      | '2' -> Some 2
+      | '3' -> Some 3
+      | '4' -> Some 4
+      | '5' -> Some 5
+      | '6' -> Some 6
+      | '7' -> Some 7
+      | '8' -> Some 8
+      | '9' -> Some 9
+      | _ -> None
+    )
+  in
+  get_key_pressed (fun c -> match num_of_char c with
+      | Some (x) -> x
+
+      | None -> get_number () (* invalid number pressed by the player *)
+    )
+
 (* get the next move of the player *)
 let get_next_move game =
   let p = get_ball game in
@@ -78,20 +102,45 @@ let create_game () =
   let balls = add_balls [] in
   Rules.new_game balls
 
+let create_random_game () = 
+  D.ready false;
+  D.draw_game max_x max_y (Rules.new_game []);
+  let n = get_number () in
+  let game = Generator.random_generator n max_x max_y in
+  let balls = Rules.get_balls game in
+  let _ = List.iter (fun b -> D.draw_ball b) balls in
+  Draw.ready true;
+  game
+
 (* A menu is a pair of string * f where f is a function of type unit -> unit.
    If the player choose on the menu which function should be called *)
-let rec menu = [("solve", solve);("play", play);("exit", leave)]
+let rec menu = [("Solve", solve);
+                ("Solve random grid", solve_random);
+                ("Play", play);
+                ("Play random grid", play_random);
+                ("exit", leave)]
 
 (* play allows the player to create a new game, and then try to solve it *)
 and play () =
-  let _ = Printf.printf "LOOP" in
   game := create_game ();
+  loop !game
+
+(* play allows the player to create a new game, and then try to solve it *)
+and play_random () =
+  game := create_random_game ();
   loop !game
 
 (* solve allows the player to create a new game and then see if the game can be solved *)
 and solve () =
   game := create_game ();
   solver !game
+
+
+(* solve allows the player to create a new game and then see if the game can be solved *)
+and solve_random () =
+  game := create_random_game ();
+  solver !game
+
 
 (* loop game loops on the game while their is still moves possible for the player *)
 and loop game =

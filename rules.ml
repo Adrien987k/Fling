@@ -157,3 +157,10 @@ let moves g =
                 moves_aux q moves
   in
   moves_aux balls []
+
+
+(* Add a ball to a game 
+   Only used for the Generation module *)
+let add_ball game ball = 
+	match game with
+	| Game balls -> Game (ball :: balls)

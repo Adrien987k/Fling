@@ -46,3 +46,9 @@ let solve game =
   in
   match graph with
   | Graph n -> solve_aux n []
+
+
+let exist_solution game =
+	match solve game with
+	| None -> false
+	| Some _ -> true
