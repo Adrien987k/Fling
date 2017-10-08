@@ -53,7 +53,6 @@ let rec get_number () =
   let num_of_char c =
     Rules.(
       match c with
-      | '0' -> Some 0
       | '1' -> Some 1
       | '2' -> Some 2
       | '3' -> Some 3
@@ -106,7 +105,7 @@ let create_random_game () =
   D.ready false;
   D.draw_game max_x max_y (Rules.new_game []);
   let n = get_number () in
-  let game = Generator.random_generator n max_x max_y in
+  let game = Generator.smart_generator n max_x max_y in
   let balls = Rules.get_balls game in
   let _ = List.iter (fun b -> D.draw_ball b) balls in
   Draw.ready true;

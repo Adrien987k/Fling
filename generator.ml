@@ -25,25 +25,29 @@ let rec random_generator n max_x max_y =
 	| None -> random_generator n max_x max_y
 	| Some _ -> game
 
-let random_ball max_x max_y =
+let random_position max_x max_y = 
 	let x = Random.int max_x and y = Random.int max_y in
-	let c = (x, y) in
-	Rules.make_ball (Position.from_int (fst c) (snd c))
+	Position.from_int x y
+	
+let random_ball max_x max_y =
+	Rules.make_ball (random_position max_x max_y)
 
 let smart_generator n max_x max_y =
 	if n < 0 then failwith "Error: Negative n" else
 	let balls = [random_ball max_x max_y] in
 	let game = Rules.new_game balls in
 	let rec construct_solution n g =
-		if n = 0 then
+		if n = 1 then
 			g
 		else
-			let new_game = Rules.add_ball game (random_ball max_x max_y) in
-			match Solver.solve new_game with
-			| None -> construct_solution n g
-			| Some _ -> construct_solution (n - 1) new_game
+			let p = random_position max_x max_y in
+			if Rules.is_ball g p then
+				construct_solution n g
+			else
+				let ball = Rules.make_ball p in
+				let new_game = Rules.add_ball g ball in
+				match Solver.solve new_game with
+				| None -> construct_solution n g
+				| Some _ -> construct_solution (n - 1) new_game
 	in
-	construct_solution n game	
-	
-
-		
+	construct_solution n game
