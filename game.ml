@@ -127,7 +127,8 @@ let rec menu = [("Solve", solve);
                 ("Solve from file", solve_from_file);
                 ("Play", play);
                 ("Play random grid", play_random);
-                ("Play from file", solve_from_file);
+                ("Play from file", play_from_file);
+                ("Create and save game", create_game_save_file);
                 ("exit", leave)]
 
 (* play allows the player to create a new game, and then try to solve it *)
@@ -139,7 +140,7 @@ and play () =
 and play_random () =
   game := create_random_game ();
   loop !game
-
+(* allows the player to play a game stored in the file flingGrid.fl *)
 and play_from_file () =
   game := create_game_from_file ();
   loop !game
@@ -149,19 +150,26 @@ and solve () =
   game := create_game ();
   solver !game
 
-
 (* solve allows the player to create a new game and then see if the game can be solved *)
 and solve_random () =
   game := create_random_game ();
   solver !game
 
+(* solve the game stored in the file flingGrid.fl *)
 and solve_from_file () =
   game := create_game_from_file ();
   solver !game
 
+(* allow the player to create a game and save it into the gridResult.fl file *)
+and create_game_save_file () =
+  game := create_game ();
+  FileManager.save_grid !game;
+  main menu;
+
 (* loop game loops on the game while their is still moves possible for the player *)
 and loop game =
   D.draw_game max_x max_y game;
+  if Rules.win game then main menu else
   loop (Rules.apply_move game (get_next_move game))
 
 (* solver game solve the game if it is possible *)

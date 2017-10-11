@@ -143,7 +143,7 @@ let apply_move g move =
 	let rec apply_move_aux g b d first =
         let p = position_of_ball b in
         (* If there is another ball just near the ball b in the direction d, the move cannot be applied *)
-		if is_ball g (Position.move p (next_pos_from_dir d))
+		if (is_ball g (Position.move p (next_pos_from_dir d))) && first
 		   then g
 		else
 			(* check if there is a ball from b in the direction d *)
@@ -186,9 +186,17 @@ let moves g =
   in
   moves_aux balls []
 
+(* Return if the game is won, if only one ball remain *)
+let win g = 
+	let balls = get_balls g in
+	(List.length balls) == 1 
 
 (* Add a ball to a game 
    Only used for the Generation module *)
 let add_ball game ball = 
 	match game with
 	| Game balls -> Game (ball :: balls)
+
+let get_ball_x_y ball =
+	match ball with
+	| Ball (p , n) -> (Position.proj_x p, Position.proj_y p) 
