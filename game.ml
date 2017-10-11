@@ -101,7 +101,7 @@ let create_game () =
   let balls = add_balls [] in
   Rules.new_game balls
 
-let create_random_game () = 
+let create_random_game () =
   D.ready false;
   D.draw_game max_x max_y (Rules.new_game []);
   let n = get_number () in
@@ -111,12 +111,23 @@ let create_random_game () =
   Draw.ready true;
   game
 
+let create_game_from_file () =
+  D.ready false;
+  D.draw_game max_x max_y (Rules.new_game []);
+  let game = FileManager.open_grid "flingGrid.fl" in
+  let balls = Rules.get_balls game in
+  let _ = List.iter (fun b -> D.draw_ball b) balls in
+  Draw.ready true;
+  game
+
 (* A menu is a pair of string * f where f is a function of type unit -> unit.
    If the player choose on the menu which function should be called *)
 let rec menu = [("Solve", solve);
                 ("Solve random grid", solve_random);
+                ("Solve from file", solve_from_file);
                 ("Play", play);
                 ("Play random grid", play_random);
+                ("Play from file", solve_from_file);
                 ("exit", leave)]
 
 (* play allows the player to create a new game, and then try to solve it *)
@@ -127,6 +138,10 @@ and play () =
 (* play allows the player to create a new game, and then try to solve it *)
 and play_random () =
   game := create_random_game ();
+  loop !game
+
+and play_from_file () =
+  game := create_game_from_file ();
   loop !game
 
 (* solve allows the player to create a new game and then see if the game can be solved *)
@@ -140,10 +155,12 @@ and solve_random () =
   game := create_random_game ();
   solver !game
 
+and solve_from_file () =
+  game := create_game_from_file ();
+  solver !game
 
 (* loop game loops on the game while their is still moves possible for the player *)
 and loop game =
-  (*if (List.length (Rules.moves game)) > 0 then*)
   D.draw_game max_x max_y game;
   loop (Rules.apply_move game (get_next_move game))
 
